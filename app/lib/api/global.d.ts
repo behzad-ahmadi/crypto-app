@@ -31,9 +31,9 @@ interface Data {
   high24h: number
   low24h: number
   priceChange24h: number
-  priceChangePercentage24h: number
+  priceChangePercentage_24h: number
   marketCapChange24h: number
-  marketCapChangePercentage24h: number
+  marketCapChangePercentage_24h: number
   circulatingSupply: number
   totalSupply: number
   maxSupply: number
