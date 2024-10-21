@@ -1,11 +1,6 @@
-export enum Hash {}
-
-export const Tags = {
-  Card: 'card',
-  Withdrawal: 'withdrawal',
-  Like: 'like',
-  Bookmark: 'bookmark',
-} as const
+export enum Hash {
+  modalChart = '#ModalChart',
+}
 
 export const Constants = {
   dateFormat: 'd MMMM y',
