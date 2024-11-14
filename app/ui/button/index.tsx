@@ -1,21 +1,46 @@
 import clsx from 'clsx'
+import React from 'react'
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string
+  children?: React.ReactNode
+  loading?: boolean
+  iconStart?: React.ReactNode
+  iconEnd?: React.ReactNode
+  disabled?: boolean
+  size?: 'sm' | 'md'
 }
 
-export default function Button({ children, className, ...props }: ButtonProps) {
-  return (
-    <button
-      className={clsx(
-        'rounded-md bg-blue-400 text-white px-4 py-2 hover:bg-blue-500',
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </button>
-  )
+export default function Button({
+  className,
+  children,
+  loading,
+  iconStart,
+  iconEnd,
+  size = 'md',
+  ...props
+}: ButtonProps) {
+  {
+    const sizeClasses = {
+      sm: 'h-btn-sm text-base',
+      md: 'h-btn-md text-lg',
+    }
+
+    return (
+      <button
+        className={clsx(
+          'btn font-normal rounded-xl items-center flex',
+          sizeClasses[size]
+        )}
+        {...props}
+        disabled={loading || props.disabled}
+        type={props.type ? props.type : 'button'}
+      >
+        {iconStart}
+        {children}
+        {iconEnd}
+        {loading && <span className='loading loading-spinner'></span>}
+      </button>
+    )
+  }
 }

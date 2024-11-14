@@ -8,12 +8,13 @@ interface Props {
 
 export default async function Home({ searchParams }: Props) {
   return (
-    <div className=' overflow-hidden'>
-      <MainNavbar />
+    <>
+      <div className='container mx-auto overflow-hidden'>
+        <MainNavbar />
+        <SearchSection />
 
-      <SearchSection />
-
-      <CryptoList />
-    </div>
+        <CryptoList />
+      </div>
+    </>
   )
 }
