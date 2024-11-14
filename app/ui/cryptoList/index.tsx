@@ -1,8 +1,8 @@
 'use client'
-// https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&category=layer-1&order=market_cap_desc&per_page=2000&page=1&x_cg_demo_api_key=CG-Sq1dVc1fvuR8d1NWg7YCGadr
 import Table from '@/app/ui/table'
 import { toast } from 'react-toastify'
 import useData from '@/app/hook/useData'
+import Modal from '@/app/ui/modal'
 export const CurrencyTypes = ['USD', 'EUR', 'JPY'] as const
 
 interface Props {}
@@ -13,6 +13,7 @@ const ColumnsHeaders = [
   { key: 'currentPrice', value: 'Price' },
   { key: 'priceChangePercentage_24h', value: '24h' },
   { key: 'totalSupply', value: 'Total Volume' },
+  { key: 'chart', value: '' },
 ]
 
 const CryptoList: React.FC<Props> = () => {
@@ -23,7 +24,7 @@ const CryptoList: React.FC<Props> = () => {
   }
 
   return (
-    <div className='w-full h-[500px] overflow-auto mt-44'>
+    <div className='w-full h-[500px] overflow-auto mt-44 no-scrollbar'>
       <Table columnHeader={ColumnsHeaders} columnData={data || []} />
     </div>
   )

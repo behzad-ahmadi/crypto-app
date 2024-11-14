@@ -1,5 +1,7 @@
 import useData from '@/app/hook/useData'
+import useModal from '@/app/hook/useModal'
 import { Data } from '@/app/lib/api/global'
+import { Hash } from '@/app/lib/config/constants'
 import InputText from '@/app/ui/inputText'
 import clsx from 'clsx'
 import { useRouter } from 'next/navigation'
@@ -12,22 +14,26 @@ export default function SearchInput() {
     defaultValue: '',
     clearOnDefault: true,
   })
-  const router = useRouter()
   const { data, isLoading, error } = useData()
   const [list, setList] = useState<Data[]>([])
   const [showList, setShowList] = useState(false)
+  const router = useRouter()
+
+  const handleModal = () => {
+    router.push(Hash.modalChart)
+  }
 
   useEffect(() => {
     if (data) setList(data)
   }, [data])
 
   useEffect(() => {
-    // if (search) {
-    //   const filteredList = data?.filter(item => {
-    //     return item.name.toLowerCase().includes(search.toLowerCase())
-    //   })
-    //   setList(filteredList || [])
-    // }
+    if (search) {
+      const filteredList = data?.filter(item => {
+        return item.name.toLowerCase().includes(search.toLowerCase())
+      })
+      setList(filteredList || [])
+    }
   }, [search])
 
   const handleSearch = (search: string) => setSearch(search)
@@ -49,7 +55,7 @@ export default function SearchInput() {
       <div
         className={clsx(
           'absolute bg-slate-700 rounded-md py-2 mt-2 no-scrollbar',
-          'w-full max-h-60 overflow-auto',
+          'w-full max-h-60 overflow-auto z-10',
           showList ? 'block' : 'hidden'
         )}
       >
@@ -57,7 +63,8 @@ export default function SearchInput() {
           <div
             className='cursor-pointer hover:bg-slate-600 py-3 px-2 flex gap-2 border-b border-gray-500'
             onClick={() => {
-              console.log('clicked', item)
+              // setSearch(item.name)
+              handleModal()
             }}
             key={i}
           >
