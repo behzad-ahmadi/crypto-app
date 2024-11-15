@@ -20,7 +20,7 @@ export default function Page() {
   useEffect(() => {
     const subscription = {
       method: 'state.subscribe',
-      params: { market_list: ['BTCUSDT'] }, // Replace with the desired market
+      params: { market_list: [] },
       id: 1,
     }
 
@@ -29,7 +29,7 @@ export default function Page() {
     return () => {
       const unsubscription = {
         method: 'state.unsubscribe',
-        params: ['market.ticker', 'BTCUSDT'],
+        params: ['market.ticker'],
         id: 1,
       }
       sendMessage(unsubscription)
