@@ -20,7 +20,7 @@ const CryptoList: React.FC<Props> = () => {
   const { data, isLoading, error } = useData()
 
   if (error) {
-    toast.error('An unexpected error occurred')
+    // toast.error('An unexpected error occurred')
   }
 
   return (
