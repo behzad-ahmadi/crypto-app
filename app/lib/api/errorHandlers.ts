@@ -1,5 +1,5 @@
-import { ResponseType } from '@/lib/api/global'
-import AppMessages from '@/lib/config/appMessages'
+import { ResponseType } from '@/app/lib/api/global'
+import AppMessages from '@/app/lib/config/appMessages'
 import { toast } from 'react-toastify'
 
 const handleSuccess = (text: string) => {
@@ -21,10 +21,10 @@ export const handleResponse = (response: ResponseType, showMsg = true) => {
     if (response.status === 401) {
       // Handle unauthorized status
       const msg = response?.message || (response.error as any)?.message
-      showMsg && showErrorToast(msg)
+      if (showMsg) showErrorToast(msg)
     } else {
       const msg = response?.message || (response.error as any)?.message
-      showMsg && showErrorToast(msg)
+      if (showMsg) showErrorToast(msg)
     }
   }
 }

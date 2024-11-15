@@ -1,5 +1,5 @@
 'use server'
-import { Constants } from '@/lib/config/constants'
+import { Constants } from '@/app/lib/config/constants'
 import { cookies } from 'next/headers'
 
 const sessionName = Constants.SessionName

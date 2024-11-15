@@ -6,5 +6,6 @@ export const cryptoApi = {
     get({
       url: `${Constants.ApiBseURL}`,
       params,
+      convertKeys: true,
     }),
 }

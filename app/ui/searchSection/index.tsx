@@ -1,6 +1,6 @@
 'use client'
 
-import { Constants, Hash } from '@/app/lib/config/constants'
+import { Hash } from '@/app/lib/config/constants'
 import { CurrencyTypes } from '@/app/ui/cryptoList'
 import Modal from '@/app/ui/modal'
 import SearchInput from '@/app/ui/searchSection/searchInput'
@@ -25,7 +25,9 @@ export default function SearchSection() {
 
         <Select
           onChange={e => {
-            e.target.value && handleCurrency(e.target.value)
+            if (e.target.value) {
+              handleCurrency(e.target.value)
+            }
           }}
           value={currency}
         >

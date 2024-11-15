@@ -1,4 +1,4 @@
-import { ResponseType } from '@/app/lib/api/global'
+import { MetadataProps } from '@/app/lib/api/global'
 import { Metadata } from 'next'
 import { toast } from 'react-toastify'
 
@@ -30,7 +30,9 @@ export function toCamelCase(obj: any): Record<string, any> {
   return camelCaseObj
 }
 
-export function toCamelCaseArray(arr: any[]): ResponseType {
+export function toCamelCaseArray<T>(
+  arr: T[]
+): T[] | Record<string, any> | undefined {
   if (!arr) return arr
 
   return arr.map(item => (typeof item === 'object' ? toCamelCase(item) : item))

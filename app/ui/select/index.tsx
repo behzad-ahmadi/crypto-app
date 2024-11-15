@@ -1,11 +1,9 @@
 import clsx from 'clsx'
 import React from 'react'
 
-interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  // Add any custom props or overrides here
-}
-
-export default function Select({ ...props }: SelectProps) {
+export default function Select({
+  ...props
+}: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
       {...props}

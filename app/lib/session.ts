@@ -1,11 +1,11 @@
 //CLient side cookies
-import { Constants } from '@/lib/config/constants'
+import Cookies from 'js-cookie'
+import { Constants } from '@/app/lib/config/constants'
 import {
   serverDestroySession,
   serverGetToken,
   serverSetToken,
-} from '@/lib/serverSession'
-import Cookies from 'js-cookie'
+} from '@/app/lib/serverSession'
 
 const sessionName = Constants.SessionName
 const expireTime = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // one week

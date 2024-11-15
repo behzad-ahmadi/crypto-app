@@ -1,5 +1,7 @@
+'use client'
+
 import useData from '@/app/hook/useData'
-import useModal from '@/app/hook/useModal'
+// import useModal from '@/app/hook/useModal'
 import { Data } from '@/app/lib/api/global'
 import { Hash } from '@/app/lib/config/constants'
 import InputText from '@/app/ui/inputText'
@@ -14,7 +16,7 @@ export default function SearchInput() {
     defaultValue: '',
     clearOnDefault: true,
   })
-  const { data, isLoading, error } = useData()
+  const { data } = useData()
   const [list, setList] = useState<Data[]>([])
   const [showList, setShowList] = useState(false)
   const router = useRouter()

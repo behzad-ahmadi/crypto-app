@@ -1,4 +1,10 @@
-import { UploadFolder } from '@/lib/config/constants'
+export interface ResponseType {
+  code: string | number // Response code
+  status: number // HTTP status code
+  error: boolean // Error flag
+  message: string // Response message
+  data: DataType // Response data
+}
 
 /**
  * Generic data type for response data.

@@ -1,4 +1,4 @@
-import { toSnakeCase, toSnakeCaseArray } from '@/app/lib/helper'
+import { toSnakeCase } from '@/app/lib/helper'
 import {
   DeleteParamsType,
   GetParamsType,
@@ -6,6 +6,7 @@ import {
 } from './crud.d'
 import fetchData from '@/app/lib/api/fetch'
 import { handleRequestError, handleResponse } from '@/app/lib/api/errorHandlers'
+import { ResponseType } from '@/app/lib/api/global'
 
 export const get = async (params: GetParamsType): Promise<ResponseType> => {
   try {
@@ -19,8 +20,9 @@ export const get = async (params: GetParamsType): Promise<ResponseType> => {
       next,
     } = params
     const queryString = new URLSearchParams(
-      convertKeys ? toSnakeCaseArray(queryParams) : queryParams
+      convertKeys ? toSnakeCase(queryParams) : queryParams
     ).toString()
+
     const finalUrl = queryString ? `${url}?${queryString}` : url
 
     const options: RequestInit = {

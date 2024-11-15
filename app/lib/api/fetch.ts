@@ -1,10 +1,10 @@
 import { ResponseType } from '@/app/lib/api/global'
-import { toCamelCase, toCamelCaseArray } from '@/app/lib/helper'
+import { toCamelCaseArray } from '@/app/lib/helper'
 
 const fetchData = async (
   url: string,
   options: RequestInit,
-  convertKeys: true,
+  convertKeys: boolean,
   timeout: number = 18000
 ): Promise<ResponseType> => {
   const controller = new AbortController()
@@ -17,7 +17,7 @@ const fetchData = async (
 
     if (convertKeys) {
       if (Array.isArray(responseData)) {
-        responseData = toCamelCaseArray(responseData)
+        responseData = toCamelCaseArray(responseData) as ResponseType
       }
     }
 

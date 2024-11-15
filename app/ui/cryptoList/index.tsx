@@ -1,11 +1,8 @@
 'use client'
 import Table from '@/app/ui/table'
-import { toast } from 'react-toastify'
 import useData from '@/app/hook/useData'
-import Modal from '@/app/ui/modal'
+import { Suspense } from 'react'
 export const CurrencyTypes = ['USD', 'EUR', 'JPY'] as const
-
-interface Props {}
 
 const ColumnsHeaders = [
   { key: 'symbol', value: 'Coin' },
@@ -16,8 +13,8 @@ const ColumnsHeaders = [
   { key: 'chart', value: '' },
 ]
 
-const CryptoList: React.FC<Props> = () => {
-  const { data, isLoading, error } = useData()
+export default function CryptoList() {
+  const { data, error } = useData()
 
   if (error) {
     // toast.error('An unexpected error occurred')
@@ -25,9 +22,9 @@ const CryptoList: React.FC<Props> = () => {
 
   return (
     <div className='w-full h-[500px] overflow-auto mt-44 no-scrollbar'>
-      <Table columnHeader={ColumnsHeaders} columnData={data || []} />
+      <Suspense>
+        <Table columnHeader={ColumnsHeaders} columnData={data || []} />
+      </Suspense>
     </div>
   )
 }
-
-export default CryptoList

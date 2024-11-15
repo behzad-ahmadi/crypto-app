@@ -30,7 +30,8 @@ export default function Button({
       <button
         className={clsx(
           'btn font-normal rounded-xl items-center flex',
-          sizeClasses[size]
+          sizeClasses[size],
+          className
         )}
         {...props}
         disabled={loading || props.disabled}
