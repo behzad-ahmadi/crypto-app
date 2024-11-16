@@ -1,41 +1,32 @@
 'use client'
+import { useWebSocket } from '@/app/hook/useWebSocket'
+import { useEffect } from 'react'
 
-import useNativeWebSocket from '@/app/hook/useWebSocket'
-import { useEffect, useState } from 'react'
+const SOCKET_URL = 'wss://socket.coinex.com/v2/spot'
 
-export default function Page() {
-  const [marketData, setMarketData] = useState<any[]>([])
-
-  const { sendMessage, isConnected } = useNativeWebSocket(
-    'wss://socket.coinex.com/v2/spot',
-    {
-      onMessage: data => {
-        if (data && data.channel === 'state.subscribe') {
-          setMarketData(prev => [...prev, data])
-        }
-      },
-    }
-  )
+const Home = () => {
+  const { isConnected, sendMessage } = useWebSocket(SOCKET_URL, {
+    onMessage: data => {
+      console.log('WebSocket message received:', data)
+    },
+    pingInterval: 10000, // Send ping every 10 seconds
+  })
 
   useEffect(() => {
-    const subscription = {
-      method: 'state.subscribe',
-      params: { market_list: [] },
-      id: 1,
+    if (isConnected) {
+      sendMessage({
+        method: 'state.subscribe',
+        params: ['BTCUSDT'], // Adjust to the specific market or data you want
+      })
     }
+  }, [isConnected, sendMessage])
 
-    if (isConnected) sendMessage(subscription)
-
-    return () => {
-      const unsubscription = {
-        method: 'state.unsubscribe',
-        params: ['market.ticker'],
-        id: 1,
-      }
-      sendMessage(unsubscription)
-    }
-  }, [sendMessage, isConnected])
-
-  console.log('marketData', marketData)
-  return <></>
+  return (
+    <div className='p-4'>
+      <h1 className='text-xl font-bold'>CoinEx WebSocket Example</h1>
+      <p>Status: {isConnected ? 'Connected' : 'Disconnected'}</p>
+    </div>
+  )
 }
+
+export default Home
