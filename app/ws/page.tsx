@@ -1,7 +1,7 @@
 'use client'
 
 import useWebSocket from '@/app/hook/useWebSocket'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 
 type TradingPairData = {
   [pair: string]: {
@@ -35,6 +35,7 @@ const CoinExMarket: React.FC = () => {
           }))
         }
       } catch (err) {
+        setError('Error processing message:' + err)
         console.error('Error processing message:', err)
       }
     },
