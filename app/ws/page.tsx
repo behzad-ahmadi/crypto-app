@@ -1,5 +1,6 @@
 'use client'
 
+import useCoinExData from '@/app/hook/useCoinex'
 import useWebSocket from '@/app/hook/useWebSocket'
 import React, { useState } from 'react'
 
@@ -17,7 +18,7 @@ const CoinExMarket: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
 
   const { isConnected } = useWebSocket({
-    url: 'wss://socket.coinex.com/v2/spot/',
+    url: 'wss://socket.coinex.com/v2/spot',
     subscribePayload: {
       method: 'depth.subscribe',
       params: ['BTCUSDT', 5, '0'],
@@ -39,8 +40,8 @@ const CoinExMarket: React.FC = () => {
         console.error('Error processing message:', err)
       }
     },
-    apiKey: process.env.NEXT_PUBLIC_COINEX_API_KEY || '',
-    apiSecret: process.env.NEXT_PUBLIC_COINEX_API_SECRET || '',
+    apiKey: 'AC9709B77462456EA98CC93851A95D05',
+    apiSecret: '9A8F0B5B10DA151E56917C369927B9647048F4360B0B5695',
   })
 
   // useEffect(() => {
