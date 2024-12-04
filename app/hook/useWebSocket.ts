@@ -1,49 +1,64 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
+import crypto from 'crypto'
 
-// Access ID AC9709B77462456EA98CC93851A95D05
-// Secret Key 9A8F0B5B10DA151E56917C369927B9647048F4360B0B5695
-
-type TradingPairData = {
-  [pair: string]: {
-    last: string
-    volume: string
-    high: string
-    low: string
-  }
+type UseWebSocketProps = {
+  url: string
+  subscribePayload?: object
+  onMessage: (message: any) => void
+  apiKey: string
+  apiSecret: string
 }
 
-const useCoinExData = () => {
-  const [data, setData] = useState<TradingPairData | null>(null)
+const generateSignature = (
+  apiKey: string,
+  apiSecret: string,
+  params: object
+): string => {
+  const nonce = Date.now().toString()
+  const queryString = Object.keys(params)
+    .sort()
+    .map(key => `${key}=${params[key]}`)
+    .join('&')
+
+  const stringToSign = `${apiKey}${nonce}${queryString}${apiSecret}`
+  return crypto.createHash('sha256').update(stringToSign).digest('hex')
+}
+
+const useWebSocket = ({
+  url,
+  subscribePayload,
+  onMessage,
+  apiKey,
+  apiSecret,
+}: UseWebSocketProps) => {
   const [isConnected, setIsConnected] = useState(false)
   const wsRef = useRef<WebSocket | null>(null)
 
+  const stablePayload = useMemo(() => subscribePayload, [subscribePayload])
+
   useEffect(() => {
-    const ws = new WebSocket('wss://socket.coinex.com/v2/spot')
+    const ws = new WebSocket(url)
     wsRef.current = ws
 
     ws.onopen = () => {
       setIsConnected(true)
 
-      // Subscribe to all trading pairs
-      const subscribePayload = {
-        method: 'state.subscribe',
-        params: [],
-        id: 1,
+      if (stablePayload) {
+        const signature = generateSignature(apiKey, apiSecret, stablePayload)
+
+        const authPayload = {
+          ...stablePayload,
+          apiKey,
+          signature,
+        }
+
+        ws.send(JSON.stringify(authPayload))
       }
-      ws.send(JSON.stringify(subscribePayload))
     }
 
     ws.onmessage = event => {
       const message = JSON.parse(event.data)
-
-      // Handle updates for trading pairs
-      if (message.method === 'state.update' && message.params) {
-        const marketData = message.params[0] as TradingPairData
-        setData(prevData => ({
-          ...prevData,
-          ...marketData,
-        }))
-      }
+      onMessage(message)
     }
 
     ws.onerror = error => {
@@ -57,9 +72,9 @@ const useCoinExData = () => {
     return () => {
       ws.close()
     }
-  }, [])
+  }, [url, stablePayload, onMessage, apiKey, apiSecret])
 
-  return { data, isConnected }
+  return { isConnected }
 }
 
-export default useCoinExData
+export default useWebSocket

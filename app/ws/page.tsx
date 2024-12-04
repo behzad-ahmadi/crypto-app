@@ -1,10 +1,54 @@
 'use client'
 
-import useCoinExData from '@/app/hook/useWebSocket'
-import React from 'react'
+import useWebSocket from '@/app/hook/useWebSocket'
+import React, { useState, useEffect } from 'react'
+
+type TradingPairData = {
+  [pair: string]: {
+    last: string
+    volume: string
+    high: string
+    low: string
+  }
+}
 
 const CoinExMarket: React.FC = () => {
-  const { data, isConnected } = useCoinExData()
+  const [data, setData] = useState<TradingPairData>({})
+  const [error, setError] = useState<string | null>(null)
+
+  const { isConnected } = useWebSocket({
+    url: 'wss://socket.coinex.com/v2/spot/',
+    subscribePayload: {
+      method: 'depth.subscribe',
+      params: ['BTCUSDT', 5, '0'],
+      id: 1,
+    },
+    onMessage: message => {
+      try {
+        const parsedMessage = message?.result
+        if (parsedMessage && parsedMessage[0]) {
+          const [pair, marketData] = parsedMessage
+          const { last, volume, high, low } = marketData
+          setData(prev => ({
+            ...prev,
+            [pair]: { last, volume, high, low },
+          }))
+        }
+      } catch (err) {
+        console.error('Error processing message:', err)
+      }
+    },
+    apiKey: process.env.NEXT_PUBLIC_COINEX_API_KEY || '',
+    apiSecret: process.env.NEXT_PUBLIC_COINEX_API_SECRET || '',
+  })
+
+  // useEffect(() => {
+  //   console.log(
+  //     'keys',
+  //     process.env.NEXT_PUBLIC_COINEX_API_KEY,
+  //     process.env.NEXT_PUBLIC_COINEX_API_SECRET
+  //   )
+  // }, [])
 
   return (
     <div className='p-4 h-screen'>
@@ -12,8 +56,9 @@ const CoinExMarket: React.FC = () => {
       <p className='text-sm'>
         WebSocket Status: {isConnected ? 'Connected' : 'Disconnected'}
       </p>
+      {error && <p className='text-red-500'>{error}</p>}
 
-      {data ? (
+      {Object.keys(data).length > 0 ? (
         <div className='overflow-x-auto mt-4 max-h-96'>
           <table className='table table-zebra table-pin-rows w-full'>
             {/* Table Head */}
