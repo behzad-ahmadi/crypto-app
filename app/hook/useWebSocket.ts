@@ -18,7 +18,7 @@ const useCoinExData = () => {
   const wsRef = useRef<WebSocket | null>(null)
 
   useEffect(() => {
-    const ws = new WebSocket('wss://socket.coinex.com/')
+    const ws = new WebSocket('wss://socket.coinex.com/v2/spot')
     wsRef.current = ws
 
     ws.onopen = () => {
