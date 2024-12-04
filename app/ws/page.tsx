@@ -1,32 +1,52 @@
 'use client'
-import { useWebSocket } from '@/app/hook/useWebSocket'
-import { useEffect } from 'react'
 
-const SOCKET_URL = 'wss://socket.coinex.com/v2/spot'
+import useCoinExData from '@/app/hook/useWebSocket'
+import React from 'react'
 
-const Home = () => {
-  const { isConnected, sendMessage } = useWebSocket(SOCKET_URL, {
-    onMessage: data => {
-      console.log('WebSocket message received:', data)
-    },
-    pingInterval: 10000, // Send ping every 10 seconds
-  })
-
-  useEffect(() => {
-    if (isConnected) {
-      sendMessage({
-        method: 'state.subscribe',
-        params: ['BTCUSDT'], // Adjust to the specific market or data you want
-      })
-    }
-  }, [isConnected, sendMessage])
+const CoinExMarket: React.FC = () => {
+  const { data, isConnected } = useCoinExData()
 
   return (
-    <div className='p-4'>
-      <h1 className='text-xl font-bold'>CoinEx WebSocket Example</h1>
-      <p>Status: {isConnected ? 'Connected' : 'Disconnected'}</p>
+    <div className='p-4 h-screen'>
+      <h1 className='text-2xl font-bold'>CoinEx Market Data</h1>
+      <p className='text-sm'>
+        WebSocket Status: {isConnected ? 'Connected' : 'Disconnected'}
+      </p>
+
+      {data ? (
+        <div className='overflow-x-auto mt-4 max-h-96'>
+          <table className='table table-zebra table-pin-rows w-full'>
+            {/* Table Head */}
+            <thead>
+              <tr>
+                <th>Pair</th>
+                <th>Last Price</th>
+                <th>Volume</th>
+                <th>24h High</th>
+                <th>24h Low</th>
+              </tr>
+            </thead>
+            {/* Table Body */}
+            <tbody>
+              {Object.entries(data).map(
+                ([pair, { last, volume, high, low }]) => (
+                  <tr key={pair}>
+                    <td className='font-semibold'>{pair}</td>
+                    <td>{last}</td>
+                    <td>{volume}</td>
+                    <td>{high}</td>
+                    <td>{low}</td>
+                  </tr>
+                )
+              )}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p>Loading market data...</p>
+      )}
     </div>
   )
 }
 
-export default Home
+export default CoinExMarket

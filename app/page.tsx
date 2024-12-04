@@ -8,6 +8,7 @@ export default async function Home() {
     <>
       <div className='container mx-auto overflow-hidden'>
         <MainNavbar />
+
         <Suspense>
           <SearchSection />
         </Suspense>

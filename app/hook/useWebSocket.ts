@@ -1,87 +1,65 @@
-import { useEffect, useRef, useState } from 'react'
-import WebSocket from 'isomorphic-ws'
+import { useState, useEffect, useRef } from 'react'
 
-type Message = {
-  method: string
-  params: any
-  id?: number
+// Access ID AC9709B77462456EA98CC93851A95D05
+// Secret Key 9A8F0B5B10DA151E56917C369927B9647048F4360B0B5695
+
+type TradingPairData = {
+  [pair: string]: {
+    last: string
+    volume: string
+    high: string
+    low: string
+  }
 }
 
-type UseWebSocketOptions = {
-  onMessage?: (data: any) => void
-  onError?: (error: Event) => void
-  onClose?: (event: CloseEvent) => void
-  pingInterval?: number // milliseconds
-}
-
-export const useWebSocket = (url: string, options?: UseWebSocketOptions) => {
+const useCoinExData = () => {
+  const [data, setData] = useState<TradingPairData | null>(null)
   const [isConnected, setIsConnected] = useState(false)
   const wsRef = useRef<WebSocket | null>(null)
-  const pingRef = useRef<NodeJS.Timeout | null>(null)
 
-  const connect = () => {
-    const ws = new WebSocket(url)
+  useEffect(() => {
+    const ws = new WebSocket('wss://socket.coinex.com/')
     wsRef.current = ws
 
     ws.onopen = () => {
       setIsConnected(true)
-      console.log('WebSocket connection opened')
+
+      // Subscribe to all trading pairs
+      const subscribePayload = {
+        method: 'state.subscribe',
+        params: [],
+        id: 1,
+      }
+      ws.send(JSON.stringify(subscribePayload))
     }
 
     ws.onmessage = event => {
-      if (options?.onMessage) {
-        const data = JSON.parse(event.data.toString())
-        options.onMessage(data)
+      const message = JSON.parse(event.data)
+
+      // Handle updates for trading pairs
+      if (message.method === 'state.update' && message.params) {
+        const marketData = message.params[0] as TradingPairData
+        setData(prevData => ({
+          ...prevData,
+          ...marketData,
+        }))
       }
     }
 
     ws.onerror = error => {
-      console.error('WebSocket error', error)
-      options?.onError?.(error)
+      console.error('WebSocket error:', error)
     }
 
-    ws.onclose = event => {
+    ws.onclose = () => {
       setIsConnected(false)
-      console.log('WebSocket connection closed', event)
-      options?.onClose?.(event)
-
-      // Attempt to reconnect
-      setTimeout(() => {
-        console.log('Reconnecting WebSocket...')
-        connect()
-      }, 3000) // Retry after 3 seconds
-    }
-  }
-
-  useEffect(() => {
-    connect()
-
-    // Cleanup on component unmount
-    return () => {
-      if (wsRef.current) wsRef.current.close()
-      if (pingRef.current) clearInterval(pingRef.current)
-    }
-  }, [url])
-
-  useEffect(() => {
-    if (isConnected && options?.pingInterval) {
-      pingRef.current = setInterval(() => {
-        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-          wsRef.current.send(JSON.stringify({ method: 'server.ping' }))
-        }
-      }, options.pingInterval)
     }
 
     return () => {
-      if (pingRef.current) clearInterval(pingRef.current)
+      ws.close()
     }
-  }, [isConnected, options?.pingInterval])
+  }, [])
 
-  const sendMessage = (message: Message) => {
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify(message))
-    }
-  }
-
-  return { isConnected, sendMessage }
+  return { data, isConnected }
 }
+
+export default useCoinExData
