@@ -1,75 +1,24 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
-import crypto from 'crypto'
+'use client'
+
+import { useState, useEffect, useRef } from 'react'
+import pako from 'pako'
 
 type UseWebSocketProps = {
   url: string
   subscribePayload?: Record<string, any>
   onMessage: (message: any) => void
-  apiKey: string
-  apiSecret: string
-}
-
-const generateSignature = (
-  apiKey: string,
-  apiSecret: string,
-  timestamp: number,
-  params: Record<string, any>
-): string => {
-  try {
-    // Create the string to sign, similar to Python's "timestamp + apiKey + params"
-    const preparedStr = `${timestamp}${apiKey}`
-    const queryString = Object.keys(params)
-      .sort()
-      .map(key => `${key}=${params[key]}`)
-      .join('&')
-
-    const stringToSign = preparedStr + queryString
-    console.log('String to sign:', stringToSign)
-
-    // Perform HMAC-SHA256 signing using apiSecret
-    const signedStr = crypto
-      .createHmac('sha256', apiSecret)
-      .update(stringToSign)
-      .digest('hex')
-    return signedStr
-  } catch (error) {
-    console.error('Error generating signature:', error)
-    throw new Error('Failed to generate signature')
-  }
 }
 
 const useWebSocket = ({
   url,
   subscribePayload,
   onMessage,
-  apiKey,
-  apiSecret,
 }: UseWebSocketProps) => {
   const [isConnected, setIsConnected] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const wsRef = useRef<WebSocket | null>(null)
 
-  const stablePayload = useMemo(() => subscribePayload, [subscribePayload])
-
-  const signature = useMemo(() => {
-    try {
-      if (stablePayload) {
-        const timestamp = Date.now()
-        return generateSignature(apiKey, apiSecret, timestamp, stablePayload)
-      }
-    } catch (error) {
-      setError('Signature generation failed')
-      console.error('Error in signature generation:', error)
-    }
-    return ''
-  }, [apiKey, apiSecret, stablePayload])
-
   useEffect(() => {
-    if (!apiKey || !apiSecret || !url || !onMessage || !stablePayload) {
-      console.warn('Missing required parameters for WebSocket connection')
-      return
-    }
-
     console.log('Connecting to WebSocket:', url)
     const ws = new WebSocket(url)
     wsRef.current = ws
@@ -77,46 +26,70 @@ const useWebSocket = ({
     ws.onopen = () => {
       console.log('WebSocket connected')
       setIsConnected(true)
-
-      if (stablePayload) {
-        const authPayload = {
-          ...stablePayload,
-          apiKey,
-          signature,
-        }
-
-        console.log('Sending auth payload:', authPayload)
-        ws.send(JSON.stringify(authPayload))
+      if (subscribePayload) {
+        ws.send(JSON.stringify(subscribePayload))
       }
     }
 
-    ws.onmessage = event => {
+    ws.onmessage = async event => {
       try {
-        const message = JSON.parse(event.data)
-        console.log('WebSocket message received:', message)
-        onMessage(message)
-      } catch (error) {
-        console.error('Error parsing WebSocket message:', event.data, error)
+        if (event.data instanceof Blob) {
+          const arrayBuffer = await event.data.arrayBuffer()
+          const decompressed = pako.inflate(arrayBuffer, { to: 'string' })
+          const messageData = JSON.parse(decompressed)
+          onMessage(messageData)
+        } else {
+          const messageData = JSON.parse(event.data)
+          onMessage(messageData)
+        }
+      } catch (err) {
+        setError(
+          'Error processing WebSocket message: ' + (err as Error).message
+        )
+        console.error('Error processing WebSocket message:', err)
       }
     }
 
     ws.onerror = error => {
+      setError('WebSocket encountered an error: ' + error)
       console.error('WebSocket error:', error)
-      setError('WebSocket encountered an error')
     }
 
     ws.onclose = event => {
-      console.log('WebSocket disconnected', event)
       setIsConnected(false)
+      console.log('WebSocket disconnected', event)
     }
 
     return () => {
       console.log('Cleaning up WebSocket connection')
-      ws.close()
+      wsRef.current?.close()
+      wsRef.current = null
     }
-  }, [url, stablePayload, onMessage, apiKey, apiSecret, signature])
+  }, [url]) // Reconnect only if the URL changes
 
-  return { isConnected, error }
+  // Resend subscription payload if the payload changes while connected
+  useEffect(() => {
+    if (isConnected && subscribePayload && wsRef.current) {
+      console.log('Sending subscription payload:', subscribePayload)
+      wsRef.current?.send(JSON.stringify(subscribePayload))
+    }
+  }, [subscribePayload, isConnected])
+
+  const unsubscribe = () => {
+    if (wsRef.current) {
+      wsRef.current.send(
+        JSON.stringify({
+          method: 'state.unsubscribe',
+          params: { market_list: [] },
+          id: 1,
+        })
+      )
+    }
+  }
+
+  const close = () => wsRef.current?.close()
+
+  return { isConnected, error, unsubscribe, close }
 }
 
 export default useWebSocket
