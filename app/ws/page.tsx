@@ -84,7 +84,7 @@ const CoinExMarket: React.FC = () => {
   const subscribePayload = useMemo(
     () => ({
       method: 'state.subscribe',
-      params: { market_list: TopCryptos },
+      params: { market_list: [] },
       id: 1,
     }),
     []
@@ -114,9 +114,20 @@ const CoinExMarket: React.FC = () => {
     setSearchQuery(e.target.value)
   }
 
-  const filteredData = Object.entries(data).filter(([pair]) =>
-    pair.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const filteredData = useMemo(() => {
+    const lowercaseSearchQuery = searchQuery.toLowerCase()
+    let filteredData = Object.entries(data).filter(([pair]) => {
+      return pair.toLowerCase().includes(lowercaseSearchQuery)
+    })
+
+    filteredData = filteredData.filter(([pair, _], index) =>
+      coingeckoData.includes(
+        coingeckoData.find(item => item.name.includes(pair))
+      )
+    )
+
+    return filteredData
+  }, [data, searchQuery])
 
   return (
     <div className='p-4 h-screen'>
@@ -136,7 +147,7 @@ const CoinExMarket: React.FC = () => {
         />
       </div>
 
-      {filteredData.length > 0 ? (
+      {filteredData.length > 0 && (
         <div className='overflow-x-auto mt-4 max-h-96'>
           <table className='table table-zebra table-pin-rows w-full'>
             <thead>
@@ -180,9 +191,9 @@ const CoinExMarket: React.FC = () => {
             </tbody>
           </table>
         </div>
-      ) : (
-        <p>No results found.</p>
       )}
+
+      {filteredData.length === 0 && <p>No results found.</p>}
     </div>
   )
 }
