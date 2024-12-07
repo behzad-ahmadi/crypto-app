@@ -116,15 +116,16 @@ const CoinExMarket: React.FC = () => {
 
   const filteredData = useMemo(() => {
     const lowercaseSearchQuery = searchQuery.toLowerCase()
+
     let filteredData = Object.entries(data).filter(([pair]) => {
-      return pair.toLowerCase().includes(lowercaseSearchQuery)
+      return coingeckoData.find(
+        coin => coin.symbol === pair.replace('USDT', '').toLowerCase()
+      )
     })
 
-    filteredData = filteredData.filter(([pair]) =>
-      coingeckoData.includes(
-        coingeckoData.find(item => item.name.includes(pair))
-      )
-    )
+    filteredData = filteredData.filter(([pair]) => {
+      return pair.toLowerCase().includes(lowercaseSearchQuery)
+    })
 
     return filteredData
   }, [data, searchQuery])
@@ -200,57 +201,57 @@ const CoinExMarket: React.FC = () => {
 
 export default CoinExMarket
 
-// const TopCryptos = [
-//   'BTCUSDT',
-//   'ETHUSDT',
-//   'DOGEUSDT',
-//   'LTCUSDT',
-//   'XRPUSDT',
-//   'BCHUSDT',
-//   'EOSUSDT',
-//   'ADAUSDT',
-//   'SOLUSDT',
-//   'DOTUSDT',
-//   'MATICUSDT',
-//   'AVAXUSDT',
-//   'SHIBUSDT',
-//   'LINKUSDT',
-//   'VETUSDT',
-//   'TRXUSDT',
-//   'FILUSDT',
-//   'UNIUSDT',
-//   'DOGEUSDT',
-//   'USDTUSDC',
-//   'BNBUSDT',
-//   'FTTUSDT',
-//   'CROUSDT',
-//   'AAVEUSDT',
-//   'XLMUSDT',
-//   'ICPUSDT',
-//   'SANDUSDT',
-//   'GALAUSDT',
-//   'MKRUSDT',
-//   'AAVEUSDT',
-//   'BNTUSDT',
-//   'STMXUSDT',
-//   'GMTUSDT',
-//   'ZRXUSDT',
-//   'LRCUSDT',
-//   'ENSUSDT',
-//   'CVCUSDT',
-//   'SUSHIUSDT',
-//   'MITHUSDT',
-//   'HOTUSDT',
-//   'HNTUSDT',
-//   'XEMUSDT',
-//   'STPTUSDT',
-//   'LENDUSDT',
-//   'RUNEUSDT',
-//   'QKCUSDT',
-//   'FETUSDT',
-//   'NKNUSDT',
-//   'SKLUSDT',
-//   '1INCHUSDT',
-//   'AKROUSDT',
-//   'BALUSDT',
-// ]
+const TopCryptos = [
+  'BTCUSDT',
+  'ETHUSDT',
+  'DOGEUSDT',
+  'LTCUSDT',
+  'XRPUSDT',
+  'BCHUSDT',
+  'EOSUSDT',
+  'ADAUSDT',
+  'SOLUSDT',
+  'DOTUSDT',
+  'MATICUSDT',
+  'AVAXUSDT',
+  'SHIBUSDT',
+  'LINKUSDT',
+  'VETUSDT',
+  'TRXUSDT',
+  'FILUSDT',
+  'UNIUSDT',
+  'DOGEUSDT',
+  'USDTUSDC',
+  'BNBUSDT',
+  'FTTUSDT',
+  'CROUSDT',
+  'AAVEUSDT',
+  'XLMUSDT',
+  'ICPUSDT',
+  'SANDUSDT',
+  'GALAUSDT',
+  'MKRUSDT',
+  'AAVEUSDT',
+  'BNTUSDT',
+  'STMXUSDT',
+  'GMTUSDT',
+  'ZRXUSDT',
+  'LRCUSDT',
+  'ENSUSDT',
+  'CVCUSDT',
+  'SUSHIUSDT',
+  'MITHUSDT',
+  'HOTUSDT',
+  'HNTUSDT',
+  'XEMUSDT',
+  'STPTUSDT',
+  'LENDUSDT',
+  'RUNEUSDT',
+  'QKCUSDT',
+  'FETUSDT',
+  'NKNUSDT',
+  'SKLUSDT',
+  '1INCHUSDT',
+  'AKROUSDT',
+  'BALUSDT',
+]
