@@ -3,6 +3,7 @@ import localFont from 'next/font/local'
 import './globals.css'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import {NuqsAdapter} from "nuqs/adapters/next/app";
 
 const geistSans = localFont({
   src: './lib/config/fonts/GeistVF.woff',
@@ -30,9 +31,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased max-w-screen-xl mx-auto`}
       >
+      <NuqsAdapter>
         <ToastContainer />
 
         {children}
+      </NuqsAdapter>
       </body>
     </html>
   )
