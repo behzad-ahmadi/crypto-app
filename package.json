@@ -17,9 +17,8 @@
     "nuqs": "^2.2.3",
     "pako": "^2.1.0",
     "react": "^19.0.0",
-    "react-dom": "^18",
-    "react-toastify": "^10.0.6",
-    "swr": "^2.2.5"
+    "react-dom": "^19.0.0",
+    "react-toastify": "^10.0.6"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",
@@ -31,6 +30,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.15",
     "postcss": "^8",
+    "prettier": "3.4.2",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }
